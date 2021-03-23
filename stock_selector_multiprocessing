@@ -1,0 +1,47 @@
+import pandas_datareader as pdr
+import pandas as pd
+from datetime import datetime,timedelta
+from yahoo_fin import stock_info as si
+import gc
+from multiprocessing import Process, Manager,Queue
+from stock_utilities import get_statistic,predict_all_stocks
+
+if __name__ == "__main__":
+
+    period_init = [pd.to_datetime('2020-11-01'), pd.to_datetime('today')]  # get the stock data within this period
+    period_ref = [pd.to_datetime('2021-2-11'), pd.to_datetime('today')]  # evaluate the strategy within this period
+
+    manager=Manager()
+    stock_list = ['FUBO', 'TSLA', 'PDD', 'WISH', 'CAN', 'BYND', 'HUYA']
+    stock_list = ['FUBO', 'TSLA', 'PDD', 'WISH', 'CAN', 'BYND', 'HUYA','FUTU','ZM', 'GEVO', 'ENPH', 'BLDP', 'CLOV', "TDOC", 'MELI', 'CRON', 'GHVI', 'FUSE', 'BZUN']  # 股票名称
+    eval_indexes=['stock','wait_gap','date','profit_max','profit_min','sell_strong','dontsell_strong','shouldsell','shouldnotsell','sell_decision']
+    eval_matrix=manager.list()
+    values_min=manager.list()
+    processes=[]
+    for stock in stock_list:
+        p=Process(target=get_statistic,args=(eval_matrix,values_min,stock,period_init,period_ref))
+        # eval_matrix+=eval_matrix_one_stock
+        # values_min.append((stock,value_min))
+        p.start()
+        processes.append(p)
+    for p in processes:
+        p.join()
+    eval_df = pd.DataFrame(list(eval_matrix), columns=eval_indexes)
+    values_df=pd.DataFrame(list(values_min),columns=['stock','value_min'])
+    values_df.to_csv('values_min_{}.csv'.format(pd.to_datetime('today').strftime('%Y_%m_%d')))
+    
+    
+    #----
+    df_final,predict_mat=predict_all_stocks(values_df, eval_df)
+    df_final.to_csv('stock_hist_{}.csv'.format(pd.to_datetime('today').strftime('%Y_%m_%d')))
+    predict_mat.to_csv('stock_recommend_{}.csv'.format(pd.to_datetime('today').strftime('%Y_%m_%d')))
+
+    # for item in values_df.itertuples():
+    #     print([item[1],item[2]])
+
+
+
+
+
+
+
