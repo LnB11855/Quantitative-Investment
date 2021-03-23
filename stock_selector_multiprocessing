@@ -13,7 +13,6 @@ if __name__ == "__main__":
 
     manager=Manager()
     stock_list = ['FUBO', 'TSLA', 'PDD', 'WISH', 'CAN', 'BYND', 'HUYA']
-    stock_list = ['FUBO', 'TSLA', 'PDD', 'WISH', 'CAN', 'BYND', 'HUYA','FUTU','ZM', 'GEVO', 'ENPH', 'BLDP', 'CLOV', "TDOC", 'MELI', 'CRON', 'GHVI', 'FUSE', 'BZUN']  # 股票名称
     eval_indexes=['stock','wait_gap','date','profit_max','profit_min','sell_strong','dontsell_strong','shouldsell','shouldnotsell','sell_decision']
     eval_matrix=manager.list()
     values_min=manager.list()
